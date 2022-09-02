@@ -23,7 +23,7 @@ export const ALL_TODOS = gql`
 `;
 
 export const ADD_TODO = gql`
-${TODO_FIELDS}
+  ${TODO_FIELDS}
 
   mutation AddTodo($title: String!, $completed: Boolean!, $user_id: ID!) {
     todo: createTodo(title: $title, completed: $completed, user_id: $user_id) {

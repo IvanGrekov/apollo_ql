@@ -5,15 +5,13 @@ import { Button, FormControl, Input, Flex, Spinner } from '@chakra-ui/react';
 import { ADD_TODO, ALL_TODOS } from '../apollo/todos';
 
 const AddTodo = () => {
-  const [
-    addTodo,
-    { loading, error },
-  ] = useMutation(ADD_TODO, {
+  const [addTodo, { loading, error }] = useMutation(ADD_TODO, {
     // refetchQueries: [
     //   { query: ALL_TODOS },
     // ],
 
     update(cache, { data: { todo } }) {
+      console.log(todo);
       const { todos } = cache.readQuery({ query: ALL_TODOS });
 
       cache.writeQuery({
@@ -24,16 +22,30 @@ const AddTodo = () => {
       })
     },
   });
+  
   const [text, setText] = useState('');
 
   const handleAddTodo = async () => {
     if (text.trim().length) {
       try {
+        const newTodo = {
+          title: text,
+          completed: false,
+          user_id: '1',
+        };
+
         const { data } = await addTodo({
-          variables: {
-            title: text,
-            completed: false,
-            user_id: '1',
+          variables: newTodo,
+          optimisticResponse: {
+            todo: {
+              id: `+${new Date()}`,
+              __typename: 'Todo',
+              user: {
+                id: newTodo.user_id,
+                name: '...',
+              },
+              ...newTodo,
+            },
           },
         });
 
